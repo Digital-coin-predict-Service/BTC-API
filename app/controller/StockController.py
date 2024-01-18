@@ -1,35 +1,131 @@
 import json
 
 from flask import Flask, jsonify
-from app.service.StockService import get_hello_message
-from app.Prediction.main import *
+from app.Prediction.predictions import *
 from app.config import db, app
 from app.Entity.Stock import Stock
 
-
-# app = Flask(__name__)
-
 @app.route('/prediction')
-def Prediction():
-    prediction = btc_prediction()
+def prediction():
+    # =======================<BTC>=============================
+    forecast = btc_prediction()
 
-    # result = Stock.query.filter_by(name="BTC").first()
+    result = Stock.query.filter_by(name="BTC").first()
+    path = result.path
+
+    with open(path, 'w') as f:
+        json.dump(forecast, f, indent=2)
+
+    f.close()
+
+    # =======================<ETH>=============================
+
+    forecast = eth_prediction()
+
+    result = Stock.query.filter_by(name="ETH").first()
+    path = result.path
+
+    with open(path, 'w') as f:
+        json.dump(forecast, f, indent=2)
+
+    f.close()
+
+    # =======================<XRP>=============================
+
+    # forecast = xrp_prediction()
+    #
+    # result = Stock.query.filter_by(name="XRP").first()
     # path = result.path
     #
     # with open(path, 'w') as f:
-    #     json.dump(prediction, f, indent=2)
+    #     json.dump(forecast, f, indent=2)
     #
-    # response = app.response_class(status=200)
+    # f.close()
     #
-    # return response
+    # # =======================<ASTR>=============================
+    #
+    # forecast = astr_prediction()
+    #
+    # result = Stock.query.filter_by(name="ASTR").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<GMT>=============================
+    #
+    # forecast = gmt_prediction()
+    #
+    # result = Stock.query.filter_by(name="GMT").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<POWR>=============================
+    #
+    # forecast = powr_prediction()
+    #
+    # result = Stock.query.filter_by(name="POWR").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<SEI>=============================
+    #
+    # forecast = sei_prediction()
+    #
+    # result = Stock.query.filter_by(name="SEI").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<SOL>=============================
+    #
+    # forecast = sol_prediction()
+    #
+    # result = Stock.query.filter_by(name="SOL").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<STX>=============================
+    #
+    # forecast = stx_prediction()
+    #
+    # result = Stock.query.filter_by(name="STX").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
+    #
+    # # =======================<T>=============================
+    #
+    # forecast = t_prediction()
+    #
+    # result = Stock.query.filter_by(name="T").first()
+    # path = result.path
+    #
+    # with open(path, 'w') as f:
+    #     json.dump(forecast, f, indent=2)
+    #
+    # f.close()
 
+    response = app.response_class(status=200)
+    return response
 
-# @app.route('/<name>')
-# def findStockPathByName(name):
-#     result = Stock.query.filter_by(name=name).first()
-#     path = result.path
-#
-#     with open(path, 'r') as json_file:
-#         data = json.load(json_file)
-#
-#     return jsonify(data)
