@@ -13,6 +13,11 @@ from calendar import monthrange
 import pyupbit
 import time
 
+BTC_path = "app/Prediction/BTC_model/model.h5"
+
+BTCmodel = tf.keras.models.load_model(BTC_path)
+BTCmodel.predict(np.zeros((1, 50, 2)))
+
 def moving_average(data, window_size):
     # 주어진 윈도우 크기에 따라 가중치를 생성
     weights = np.repeat(1.0, window_size) / window_size
@@ -29,10 +34,6 @@ def btc_prediction():
     x_step = 50  # length of train_x of each time step
     dividing = 10000
 
-    h5_model = "app/Prediction/BTC_model/model.h5"
-
-    model = tf.keras.models.load_model(h5_model)
-
     dataframe = pyupbit.get_ohlcv(ticker="KRW-BTC", interval="minute1", count=x_step+9)
 
     volume = dataframe['volume'].values
@@ -47,11 +48,14 @@ def btc_prediction():
 
     data = np.concatenate((price, volume), axis=1)
 
-    prediction = model.predict(np.array([data]))
+    prediction = BTCmodel.predict(np.array([data]))
 
     prediction = scaler.inverse_transform(prediction)*10000
 
     result = np.append(scaler.inverse_transform(price)*10000, prediction)
+
+    plt.plot(result.flatten())
+    plt.show()
 
     return result.flatten()
 
