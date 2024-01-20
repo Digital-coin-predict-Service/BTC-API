@@ -1,131 +1,50 @@
-import json
+from flask_apscheduler import scheduler
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Flask
 
-from flask import Flask, jsonify
 from app.Prediction.predictions import *
 from app.config import db, app
 from app.Entity.Stock import Stock
+from app.Repository.StockRepository import StockRepository
+from app.Repository.CoinPredictRepository import CoinPredictRepository
+from app.Repository.PredictValuesRepository import PredictValuesRepository
 
-@app.route('/prediction')
+stock_repository = StockRepository()
+coin_predict_repository = CoinPredictRepository()
+predict_values_repository = PredictValuesRepository()
+
+price_error = {"BTC": 0,
+               "ETH": 0,
+               "XRP": 0,
+               "ASTR": 0,
+               "GMT": 0,
+               "POWR": 0,
+               "SEI": 0,
+               "SOL": 0,
+               "STX": 0,
+               "T": 0}
+
+coin_list = ['BTC', 'ETH', 'XRP', 'ASTR', 'GMT', 'POWR', 'SEI', 'SOL', 'STX', 'T']
+
+#this is function which should be run every minute.
 def prediction():
-    # =======================<BTC>=============================
-    forecast = btc_prediction()
+    for coin in coin_list:
+        stock = stock_repository.findByStockCode(coin)
 
-    result = Stock.query.filter_by(name="BTC").first()
-    path = result.path
+        current_price = pyupbit.get_current_price("KRW-" + coin)
+        stock.latest_price = abs(price_error[coin] - current_price)
+        stock.error_rate = (stock.latest_price / current_price) * 100
 
-    with open(path, 'w') as f:
-        json.dump(forecast, f, indent=2)
+        forecast = coin_prediction(coin)
+        price_error[coin] = forecast[-10]
 
-    f.close()
+        coin_predict_repository.saveCoinPredict(stock.id)
+        coin_predict = coin_predict_repository.findByCoinId(stock.id)
 
-    # =======================<ETH>=============================
+        for i, value in enumerate(forecast):
+            predict_values_repository.savePredictValue(coin_predict.id, value, i)
 
-    forecast = eth_prediction()
-
-    result = Stock.query.filter_by(name="ETH").first()
-    path = result.path
-
-    with open(path, 'w') as f:
-        json.dump(forecast, f, indent=2)
-
-    f.close()
-
-    # =======================<XRP>=============================
-
-    # forecast = xrp_prediction()
-    #
-    # result = Stock.query.filter_by(name="XRP").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<ASTR>=============================
-    #
-    # forecast = astr_prediction()
-    #
-    # result = Stock.query.filter_by(name="ASTR").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<GMT>=============================
-    #
-    # forecast = gmt_prediction()
-    #
-    # result = Stock.query.filter_by(name="GMT").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<POWR>=============================
-    #
-    # forecast = powr_prediction()
-    #
-    # result = Stock.query.filter_by(name="POWR").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<SEI>=============================
-    #
-    # forecast = sei_prediction()
-    #
-    # result = Stock.query.filter_by(name="SEI").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<SOL>=============================
-    #
-    # forecast = sol_prediction()
-    #
-    # result = Stock.query.filter_by(name="SOL").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<STX>=============================
-    #
-    # forecast = stx_prediction()
-    #
-    # result = Stock.query.filter_by(name="STX").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
-    #
-    # # =======================<T>=============================
-    #
-    # forecast = t_prediction()
-    #
-    # result = Stock.query.filter_by(name="T").first()
-    # path = result.path
-    #
-    # with open(path, 'w') as f:
-    #     json.dump(forecast, f, indent=2)
-    #
-    # f.close()
+    db.session.commit()
 
     response = app.response_class(status=200)
     return response
-
