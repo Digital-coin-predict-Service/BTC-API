@@ -1,4 +1,6 @@
-from flask_apscheduler import scheduler
+import sched
+
+from flask_apscheduler import APScheduler
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask import Flask
 
@@ -26,25 +28,35 @@ price_error = {"BTC": 0,
 
 coin_list = ['BTC', 'ETH', 'XRP', 'ASTR', 'GMT', 'POWR', 'SEI', 'SOL', 'STX', 'T']
 
-#this is function which should be run every minute.
+
+# this is function which should be run every minute.
+
+app.config['SCHEDULER_API_ENABLED'] = True
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+
+
+@scheduler.task('cron', minute='*')
 def prediction():
-    for coin in coin_list:
-        stock = stock_repository.findByStockCode(coin)
+    with app.app_context():
+        for coin in coin_list:
+            stock = stock_repository.findByStockCode(coin)
 
-        current_price = pyupbit.get_current_price("KRW-" + coin)
-        stock.latest_price = abs(price_error[coin] - current_price)
-        stock.error_rate = (stock.latest_price / current_price) * 100
+            current_price = pyupbit.get_current_price("KRW-" + coin)
+            stock.latest_price = abs(price_error[coin] - current_price)
+            stock.error_rate = (stock.latest_price / current_price) * 100
 
-        forecast = coin_prediction(coin)
-        price_error[coin] = forecast[-10]
+            forecast = coin_prediction(coin)
+            price_error[coin] = forecast[-10]
 
-        coin_predict_repository.saveCoinPredict(stock.id)
-        coin_predict = coin_predict_repository.findByCoinId(stock.id)
+            coin_predict_repository.saveCoinPredict(stock.id)
+            coin_predict = coin_predict_repository.findByCoinId(stock.id)
 
-        for i, value in enumerate(forecast):
-            predict_values_repository.savePredictValue(coin_predict.id, value, i)
+            for i, value in enumerate(forecast):
+                predict_values_repository.savePredictValue(coin_predict.id, value, i)
 
-    db.session.commit()
+        db.session.commit()
 
-    response = app.response_class(status=200)
-    return response
+
+scheduler.start()
