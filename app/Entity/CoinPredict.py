@@ -6,7 +6,8 @@ import pytz
 class CoinPredict(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     coin_id = db.Column(db.Integer())
-    predict_at = db.Column(db.DateTime(), default=datetime.now(pytz.timezone('Asia/Seoul')).replace(second=0, microsecond=0))
+    predict_at = db.Column(db.DateTime())
 
     def __init__(self, coin_id):
         self.coin_id = coin_id
+        self.predict_at = datetime.now().strftime('%Y-%m-%d %H:%M')
