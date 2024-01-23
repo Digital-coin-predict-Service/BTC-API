@@ -4,7 +4,7 @@
 
 미리 학습된 각 LSTM 모델에 수집된 데이터를 LSTM 인풋에 맞춰 넣는다.
 
-예측되어 나온 결과를 db에 저장합니다.
+예측되어 나온 결과를 db에 저장한다.
 **************
 ## API 실행 과정
 ![image](https://github.com/Digital-coin-predict-Service/BTC-API/assets/112631585/eff53d34-4de1-445c-8eb5-8982f4963321)
