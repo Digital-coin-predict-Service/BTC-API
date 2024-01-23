@@ -17,9 +17,9 @@
 
 준비된 모델을 이용하여 예측을 진행한다.
 
-예측 후에는 CoinPredict db에 예측된 coid의 ID, 예측된 시간을 저장한다.
+예측 후에는 CoinPredict table에 예측된 coin의 ID, 예측된 시간을 저장한다.
 
-PredictValues db에 CoinPredictId와 예측값을 저장한다.
+PredictValues table에 CoinPredictId와 예측값을 저장한다.
 
 ***************
 ## 추가 요구 사항
