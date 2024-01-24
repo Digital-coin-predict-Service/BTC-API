@@ -44,11 +44,13 @@ def prediction():
             stock = stock_repository.findByStockCode(coin)
 
             current_price = pyupbit.get_current_price("KRW-" + coin)
-            stock.latest_price = abs(price_error[coin] - current_price)
-            stock.error_rate = (stock.latest_price / current_price) * 100
+            stock.current_price = current_price
+            stock.latest_price = float(abs(price_error[coin] - current_price))
+            stock.error_rate = (stock.latest_price / current_price)
 
             forecast = coin_prediction(coin)
             price_error[coin] = forecast[-10]
+            stock.estimated_price = sum(forecast) / len(forecast)
 
             coin_predict_repository.saveCoinPredict(stock.id)
             coin_predict = coin_predict_repository.findByCoinId(stock.id)

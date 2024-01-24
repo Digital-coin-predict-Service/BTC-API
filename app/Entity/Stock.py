@@ -7,3 +7,5 @@ class Stock(db.Model):
     code = db.Column(db.String())
     latest_price = db.Column(db.Float())
     error_rate = db.Column(db.Float())
+    current_price = db.Column(db.Float())
+    estimated_price = db.Column(db.Float())

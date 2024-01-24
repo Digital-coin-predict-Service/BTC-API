@@ -4,5 +4,5 @@ from app.Entity.Stock import Stock
 import pyupbit
 
 class StockRepository:
-    def findByStockCode(self, stockName):
-        return Stock.query.filter_by(code=stockName).first()
+    def findByStockCode(self, stockCode):
+        return Stock.query.filter_by(code=stockCode).first()
