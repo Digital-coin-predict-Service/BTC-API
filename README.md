@@ -7,7 +7,7 @@
 예측되어 나온 결과를 db에 저장한다.
 **************
 ## API 실행 과정
-![image](https://github.com/Digital-coin-predict-Service/BTC-API/assets/112631585/eff53d34-4de1-445c-8eb5-8982f4963321)
+![제목 없는 다이어그램 drawio (1)](https://github.com/Digital-coin-predict-Service/BTC-API/assets/112631585/34165e3c-b4f3-4730-9935-dd7e94304073)
 
 빠른 예측을 위해 인공지능 모델을 미리 load 해두고 임의의 값으로 예측을 한 번 한다.
 
